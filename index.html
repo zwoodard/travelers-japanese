@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traveler's Japanese - Learn Essential Phrases</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Traveler's Japanese</h1>
+            <p class="subtitle">Learn essential phrases for your trip to Japan</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="flashcards">Flashcards</button>
+            <button class="tab-btn" data-tab="pronunciation">Pronunciation</button>
+            <button class="tab-btn" data-tab="stats">My Progress</button>
+            <button class="tab-btn" data-tab="categories">Categories</button>
+        </nav>
+
+        <!-- Flashcards Tab -->
+        <main id="flashcards" class="tab-content active">
+            <div class="category-filter">
+                <label for="category-select">Category:</label>
+                <select id="category-select">
+                    <option value="all">All Categories</option>
+                </select>
+            </div>
+
+            <div class="flashcard-container">
+                <div class="flashcard" id="flashcard">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <span class="frequency-badge" id="frequency-badge">Essential</span>
+                            <p class="phrase-english" id="phrase-english">Loading...</p>
+                            <p class="hint">(Click to reveal Japanese)</p>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="phrase-japanese" id="phrase-japanese">日本語</p>
+                            <p class="phrase-romaji" id="phrase-romaji">romaji</p>
+                            <p class="phrase-phonetic" id="phrase-phonetic">ah-ree-gah-toh</p>
+                            <p class="phrase-literal" id="phrase-literal"></p>
+                            <button class="audio-btn" id="audio-btn" title="Listen to pronunciation">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="answer-buttons" id="answer-buttons" style="display: none;">
+                <button class="btn btn-wrong" id="btn-wrong">I didn't know it</button>
+                <button class="btn btn-right" id="btn-right">I knew it!</button>
+            </div>
+
+            <div class="card-info" id="card-info">
+                <span id="current-stats"></span>
+            </div>
+        </main>
+
+        <!-- Stats Tab -->
+        <section id="stats" class="tab-content">
+            <h2>Your Progress</h2>
+            <div class="overall-stats" id="overall-stats">
+                <div class="stat-box">
+                    <span class="stat-number" id="total-cards">0</span>
+                    <span class="stat-label">Total Cards</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number" id="mastered-cards">0</span>
+                    <span class="stat-label">Mastered</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number" id="learning-cards">0</span>
+                    <span class="stat-label">Learning</span>
+                </div>
+            </div>
+            <div class="stats-actions">
+                <button class="btn btn-secondary" id="reset-stats">Reset All Progress</button>
+            </div>
+            <h3>Card Details</h3>
+            <div class="stats-list" id="stats-list">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+        <!-- Categories Tab -->
+        <section id="categories" class="tab-content">
+            <h2>Phrase Categories</h2>
+            <div class="categories-list" id="categories-list">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+        <!-- Pronunciation Guide Tab -->
+        <section id="pronunciation" class="tab-content">
+            <h2>Pronunciation Guide</h2>
+
+            <div class="pronunciation-intro">
+                <p>Japanese pronunciation is relatively straightforward for English speakers. Unlike English, Japanese has consistent vowel sounds and no silent letters.</p>
+            </div>
+
+            <div class="pronunciation-section">
+                <h3>The Five Vowels</h3>
+                <p class="section-intro">Japanese has only 5 vowel sounds, and they're always pronounced the same way:</p>
+                <div class="vowel-grid">
+                    <div class="vowel-card">
+                        <span class="vowel-letter">A</span>
+                        <span class="vowel-sound">ah</span>
+                        <span class="vowel-example">like "a" in "father"</span>
+                    </div>
+                    <div class="vowel-card">
+                        <span class="vowel-letter">I</span>
+                        <span class="vowel-sound">ee</span>
+                        <span class="vowel-example">like "ee" in "meet"</span>
+                    </div>
+                    <div class="vowel-card">
+                        <span class="vowel-letter">U</span>
+                        <span class="vowel-sound">oo</span>
+                        <span class="vowel-example">like "oo" in "food"</span>
+                    </div>
+                    <div class="vowel-card">
+                        <span class="vowel-letter">E</span>
+                        <span class="vowel-sound">eh</span>
+                        <span class="vowel-example">like "e" in "get"</span>
+                    </div>
+                    <div class="vowel-card">
+                        <span class="vowel-letter">O</span>
+                        <span class="vowel-sound">oh</span>
+                        <span class="vowel-example">like "o" in "go"</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pronunciation-section">
+                <h3>Key Pronunciation Tips</h3>
+                <div class="tips-list">
+                    <div class="tip-card">
+                        <h4>Double Vowels = Hold Longer</h4>
+                        <p>When you see "ou" or "oo" (like in "arigatou"), hold the "o" sound longer. Same for "ii" - hold the "ee" sound.</p>
+                        <div class="tip-example">
+                            <span class="example-word">おはよう (ohayou)</span>
+                            <span class="example-note">The final "ou" is a long "o" sound</span>
+                        </div>
+                    </div>
+                    <div class="tip-card">
+                        <h4>Double Consonants = Brief Pause</h4>
+                        <p>Double consonants (like "tt" or "kk") mean a tiny pause before the consonant, as if you're catching your breath.</p>
+                        <div class="tip-example">
+                            <span class="example-word">ちょっと (chotto)</span>
+                            <span class="example-note">Pause briefly before the "t" sound</span>
+                        </div>
+                    </div>
+                    <div class="tip-card">
+                        <h4>The "R" Sound</h4>
+                        <p>Japanese "r" is between an English "r" and "l" - tap your tongue lightly on the roof of your mouth, like a soft "d".</p>
+                        <div class="tip-example">
+                            <span class="example-word">ありがとう (arigatou)</span>
+                            <span class="example-note">The "r" is a light tap, not rolled</span>
+                        </div>
+                    </div>
+                    <div class="tip-card">
+                        <h4>Silent "U"</h4>
+                        <p>The "u" at the end of words (especially after "s" or "sh") is often barely pronounced or silent.</p>
+                        <div class="tip-example">
+                            <span class="example-word">です (desu)</span>
+                            <span class="example-note">Sounds more like "des"</span>
+                        </div>
+                    </div>
+                    <div class="tip-card">
+                        <h4>Flat Intonation</h4>
+                        <p>Unlike English, Japanese generally has flatter intonation. Avoid the rising tone English speakers often use for questions.</p>
+                        <div class="tip-example">
+                            <span class="example-word">何ですか (nan desu ka)</span>
+                            <span class="example-note">Keep pitch relatively even</span>
+                        </div>
+                    </div>
+                    <div class="tip-card">
+                        <h4>The "N" Sound</h4>
+                        <p>The standalone "n" (ん) is its own syllable and held slightly longer than "n" in English.</p>
+                        <div class="tip-example">
+                            <span class="example-word">すみません (sumimasen)</span>
+                            <span class="example-note">The final "n" is a distinct sound</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pronunciation-section">
+                <h3>Common Sound Combinations</h3>
+                <div class="combinations-grid">
+                    <div class="combo-item">
+                        <span class="combo-romaji">shi</span>
+                        <span class="combo-sound">like "she"</span>
+                    </div>
+                    <div class="combo-item">
+                        <span class="combo-romaji">chi</span>
+                        <span class="combo-sound">like "chee"</span>
+                    </div>
+                    <div class="combo-item">
+                        <span class="combo-romaji">tsu</span>
+                        <span class="combo-sound">like "tsoo" (cats + oo)</span>
+                    </div>
+                    <div class="combo-item">
+                        <span class="combo-romaji">fu</span>
+                        <span class="combo-sound">between "fu" and "hu"</span>
+                    </div>
+                    <div class="combo-item">
+                        <span class="combo-romaji">wo</span>
+                        <span class="combo-sound">usually just "o"</span>
+                    </div>
+                    <div class="combo-item">
+                        <span class="combo-romaji">ja/ju/jo</span>
+                        <span class="combo-sound">like English "ja/ju/jo"</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pronunciation-section audio-section">
+                <h3>Practice with Audio</h3>
+                <p>Click the speaker icon on any flashcard to hear the phrase spoken aloud. You can also press <kbd>P</kbd> on your keyboard while viewing a card.</p>
+                <p class="audio-note">Audio uses your device's Japanese text-to-speech. Quality may vary by browser and operating system.</p>
+            </div>
+        </section>
+
+        <footer>
+            <p>Tip: Cards you struggle with will appear more often!</p>
+        </footer>
+    </div>
+
+    <script src="phrases.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
