@@ -326,11 +326,19 @@ function showNextCard() {
 
 // Flip the card to reveal Japanese
 function flipCard() {
-    if (!currentCard || cardRevealed) return;
+    if (!currentCard) return;
 
-    flashcard.classList.add('flipped');
-    cardRevealed = true;
-    answerButtons.style.display = 'flex';
+    if (cardRevealed) {
+        // Flip back to question
+        flashcard.classList.remove('flipped');
+        cardRevealed = false;
+        answerButtons.style.display = 'none';
+    } else {
+        // Flip to answer
+        flashcard.classList.add('flipped');
+        cardRevealed = true;
+        answerButtons.style.display = 'flex';
+    }
 }
 
 // Record answer and show next card
@@ -561,12 +569,7 @@ function setupEventListeners() {
             case ' ':
             case 'Enter':
                 e.preventDefault();
-                if (!cardRevealed) {
-                    flipCard();
-                } else {
-                    // Space/Enter on revealed card shows next card (skip)
-                    showNextCard();
-                }
+                flipCard();
                 break;
             case 'ArrowRight':
             case 'j':
