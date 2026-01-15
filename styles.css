@@ -656,6 +656,26 @@ header h1 {
     opacity: 0.8;
 }
 
+/* Keyboard shortcuts */
+kbd {
+    display: inline-block;
+    background: var(--background);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: inherit;
+    font-size: 0.8em;
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.btn kbd {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.3);
+    color: inherit;
+    margin-left: 6px;
+}
+
 /* Footer */
 footer {
     margin-top: 32px;
@@ -663,6 +683,16 @@ footer {
     padding: 20px;
     color: var(--text-secondary);
     font-size: 0.9rem;
+}
+
+.hotkeys-tip {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.hotkeys-tip kbd {
+    font-size: 0.85em;
 }
 
 /* Responsive */

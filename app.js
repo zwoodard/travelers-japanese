@@ -498,6 +498,9 @@ function setupEventListeners() {
                 e.preventDefault();
                 if (!cardRevealed) {
                     flipCard();
+                } else {
+                    // Space/Enter on revealed card shows next card (skip)
+                    showNextCard();
                 }
                 break;
             case 'ArrowRight':
@@ -512,11 +515,15 @@ function setupEventListeners() {
                     recordAnswer(false);
                 }
                 break;
-            case 'p':
-            case 'P':
-                if (cardRevealed) {
-                    speakPhrase();
-                }
+            case 's':
+            case 'S':
+                // Play audio anytime
+                speakPhrase();
+                break;
+            case 'n':
+            case 'N':
+                // Skip to next card without recording
+                showNextCard();
                 break;
         }
     });
