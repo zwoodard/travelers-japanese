@@ -25,6 +25,7 @@ const btnWrong = document.getElementById('btn-wrong');
 const currentStats = document.getElementById('current-stats');
 const categorySelect = document.getElementById('category-select');
 const audioBtn = document.getElementById('audio-btn');
+const audioBtnSlow = document.getElementById('audio-btn-slow');
 const frequencyBadge = document.getElementById('frequency-badge');
 
 // Speech synthesis
@@ -101,6 +102,64 @@ function speakPhrase() {
     });
 }
 
+// Speak the current phrase slowly (0.5x speed)
+function speakPhraseSlow() {
+    if (!currentCard) return;
+
+    // Stop any currently playing audio
+    stopAudio();
+
+    // Visual feedback
+    audioBtnSlow.classList.add('speaking');
+
+    // Try pre-generated audio file first (named by romaji)
+    const audioPath = `assets/audio/${getAudioFilename(currentCard.romaji)}.mp3`;
+    currentAudio = new Audio(audioPath);
+    currentAudio.playbackRate = 0.5;
+
+    currentAudio.onended = () => {
+        audioBtnSlow.classList.remove('speaking');
+        currentAudio = null;
+    };
+
+    currentAudio.onerror = () => {
+        // Fall back to Web Speech API if audio file doesn't exist
+        currentAudio = null;
+        speakWithSynthesisSlow();
+    };
+
+    currentAudio.play().catch(() => {
+        // Fall back to Web Speech API if playback fails
+        currentAudio = null;
+        speakWithSynthesisSlow();
+    });
+}
+
+// Fallback: use Web Speech API at slow speed
+function speakWithSynthesisSlow() {
+    if (!speechSynthesis) {
+        audioBtnSlow.classList.remove('speaking');
+        return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(currentCard.japanese);
+    utterance.lang = 'ja-JP';
+    utterance.rate = 0.4; // Even slower than normal
+
+    if (japaneseVoice) {
+        utterance.voice = japaneseVoice;
+    }
+
+    utterance.onend = () => {
+        audioBtnSlow.classList.remove('speaking');
+    };
+    utterance.onerror = () => {
+        audioBtnSlow.classList.remove('speaking');
+    };
+
+    speechSynthesis.speak(utterance);
+}
+
 // Stop any currently playing audio
 function stopAudio() {
     if (currentAudio) {
@@ -111,6 +170,7 @@ function stopAudio() {
         speechSynthesis.cancel();
     }
     audioBtn.classList.remove('speaking');
+    audioBtnSlow.classList.remove('speaking');
 }
 
 // Fallback: use Web Speech API
@@ -464,10 +524,15 @@ function setupEventListeners() {
         flipCard();
     });
 
-    // Audio button
+    // Audio buttons
     audioBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         speakPhrase();
+    });
+
+    audioBtnSlow.addEventListener('click', (e) => {
+        e.stopPropagation();
+        speakPhraseSlow();
     });
 
     // Answer buttons
@@ -519,6 +584,11 @@ function setupEventListeners() {
             case 'S':
                 // Play audio anytime
                 speakPhrase();
+                break;
+            case 'd':
+            case 'D':
+                // Play slow audio
+                speakPhraseSlow();
                 break;
             case 'n':
             case 'N':

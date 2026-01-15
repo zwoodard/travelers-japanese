@@ -252,11 +252,17 @@ header h1 {
     font-style: italic;
 }
 
-/* Audio Button */
-.audio-btn {
+/* Audio Buttons Container */
+.audio-buttons {
     position: absolute;
     bottom: 16px;
     right: 16px;
+    display: flex;
+    gap: 8px;
+}
+
+/* Audio Button */
+.audio-btn {
     width: 44px;
     height: 44px;
     border: none;
@@ -268,6 +274,7 @@ header h1 {
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+    position: relative;
 }
 
 .audio-btn:hover {
@@ -278,6 +285,22 @@ header h1 {
 .audio-btn.speaking {
     background: var(--primary-color);
     animation: pulse 1s infinite;
+}
+
+.audio-btn-slow {
+    width: 52px;
+    border-radius: 22px;
+}
+
+.slow-label {
+    font-size: 10px;
+    font-weight: bold;
+    margin-left: 2px;
+}
+
+.audio-btn-slow svg {
+    width: 18px;
+    height: 18px;
 }
 
 @keyframes pulse {
