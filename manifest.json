@@ -2,7 +2,7 @@
   "name": "Traveler's Japanese",
   "short_name": "Japanese",
   "description": "Learn essential Japanese phrases for your trip to Japan",
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#f5f5f5",
   "theme_color": "#c41e3a",
