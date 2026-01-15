@@ -61,23 +61,73 @@ function initVoices() {
     }
 }
 
-// Speak the current phrase in Japanese
-function speakPhrase() {
-    if (!currentCard || !speechSynthesis) return;
+// Audio element for pre-generated audio files
+let currentAudio = null;
 
-    // Cancel any ongoing speech
-    speechSynthesis.cancel();
+// Sanitize romaji to match audio filename: lowercase, spaces to hyphens, remove special chars
+function getAudioFilename(romaji) {
+    return romaji.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '');
+}
+
+// Speak the current phrase in Japanese (tries pre-generated audio first, falls back to Web Speech API)
+function speakPhrase() {
+    if (!currentCard) return;
+
+    // Stop any currently playing audio
+    stopAudio();
+
+    // Visual feedback
+    audioBtn.classList.add('speaking');
+
+    // Try pre-generated audio file first (named by romaji)
+    const audioPath = `assets/audio/${getAudioFilename(currentCard.romaji)}.mp3`;
+    currentAudio = new Audio(audioPath);
+
+    currentAudio.onended = () => {
+        audioBtn.classList.remove('speaking');
+        currentAudio = null;
+    };
+
+    currentAudio.onerror = () => {
+        // Fall back to Web Speech API if audio file doesn't exist
+        currentAudio = null;
+        speakWithSynthesis();
+    };
+
+    currentAudio.play().catch(() => {
+        // Fall back to Web Speech API if playback fails
+        currentAudio = null;
+        speakWithSynthesis();
+    });
+}
+
+// Stop any currently playing audio
+function stopAudio() {
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+    if (speechSynthesis) {
+        speechSynthesis.cancel();
+    }
+    audioBtn.classList.remove('speaking');
+}
+
+// Fallback: use Web Speech API
+function speakWithSynthesis() {
+    if (!speechSynthesis) {
+        audioBtn.classList.remove('speaking');
+        return;
+    }
 
     const utterance = new SpeechSynthesisUtterance(currentCard.japanese);
     utterance.lang = 'ja-JP';
-    utterance.rate = 0.8; // Slightly slower for learners
+    utterance.rate = 0.8;
 
     if (japaneseVoice) {
         utterance.voice = japaneseVoice;
     }
 
-    // Visual feedback
-    audioBtn.classList.add('speaking');
     utterance.onend = () => {
         audioBtn.classList.remove('speaking');
     };
