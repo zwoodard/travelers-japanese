@@ -444,9 +444,23 @@ function updateStatsTab() {
     let masteredCount = 0;
     let learningCount = 0;
 
+    // Calculate per-category stats
+    const categoryStats = {};
+    CATEGORIES.forEach(cat => {
+        categoryStats[cat] = { total: 0, reviewed: 0, right: 0, wrong: 0 };
+    });
+
     PHRASES.forEach(phrase => {
         const cardStats = stats[phrase.id] || { right: 0, wrong: 0 };
         const total = cardStats.right + cardStats.wrong;
+        const cat = phrase.category;
+
+        categoryStats[cat].total++;
+        if (total > 0) {
+            categoryStats[cat].reviewed++;
+            categoryStats[cat].right += cardStats.right;
+            categoryStats[cat].wrong += cardStats.wrong;
+        }
 
         if (total >= 3 && (cardStats.right / total) > 0.8) {
             masteredCount++;
@@ -459,23 +473,68 @@ function updateStatsTab() {
     document.getElementById('mastered-cards').textContent = masteredCount;
     document.getElementById('learning-cards').textContent = learningCount;
 
-    // Update detailed stats list
+    // Update category stats
+    const categoryStatsEl = document.getElementById('category-stats');
+    categoryStatsEl.textContent = '';
+
+    CATEGORIES.forEach(category => {
+        const catData = categoryStats[category];
+        const totalAttempts = catData.right + catData.wrong;
+        const successRate = totalAttempts > 0 ? Math.round((catData.right / totalAttempts) * 100) : 0;
+
+        const item = document.createElement('div');
+        item.className = 'category-stat-item';
+
+        const nameEl = document.createElement('span');
+        nameEl.className = 'category-stat-name';
+        nameEl.textContent = category;
+
+        const progressEl = document.createElement('span');
+        progressEl.className = 'category-stat-progress';
+        if (catData.reviewed > 0) {
+            progressEl.textContent = `${catData.reviewed} of ${catData.total} reviewed, ${successRate}% correct`;
+        } else {
+            progressEl.textContent = `${catData.total} cards - not started`;
+        }
+
+        item.appendChild(nameEl);
+        item.appendChild(progressEl);
+        categoryStatsEl.appendChild(item);
+    });
+
+    // Update detailed stats list, grouped by category
     const statsList = document.getElementById('stats-list');
     statsList.textContent = '';
 
     let hasStats = false;
-    PHRASES.forEach(phrase => {
-        const cardStats = stats[phrase.id] || { right: 0, wrong: 0 };
-        const total = cardStats.right + cardStats.wrong;
 
-        if (total === 0) return; // Only show cards that have been practiced
+    CATEGORIES.forEach(category => {
+        const categoryPhrases = PHRASES.filter(p => p.category === category);
+        const practicedPhrases = categoryPhrases.filter(p => {
+            const cardStats = stats[p.id] || { right: 0, wrong: 0 };
+            return cardStats.right + cardStats.wrong > 0;
+        });
+
+        if (practicedPhrases.length === 0) return;
 
         hasStats = true;
-        const successRate = total > 0 ? Math.round((cardStats.right / total) * 100) : 0;
-        const isMastered = total >= 3 && successRate > 80;
 
-        const item = createStatsItem(phrase, cardStats, total, successRate, isMastered);
-        statsList.appendChild(item);
+        // Add category header
+        const categoryHeader = document.createElement('div');
+        categoryHeader.className = 'stats-category-header';
+        categoryHeader.textContent = category;
+        statsList.appendChild(categoryHeader);
+
+        // Add cards in this category
+        practicedPhrases.forEach(phrase => {
+            const cardStats = stats[phrase.id] || { right: 0, wrong: 0 };
+            const total = cardStats.right + cardStats.wrong;
+            const successRate = total > 0 ? Math.round((cardStats.right / total) * 100) : 0;
+            const isMastered = total >= 3 && successRate > 80;
+
+            const item = createStatsItem(phrase, cardStats, total, successRate, isMastered);
+            statsList.appendChild(item);
+        });
     });
 
     if (!hasStats) {

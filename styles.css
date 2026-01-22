@@ -460,6 +460,47 @@ header h1 {
     margin-bottom: 24px;
 }
 
+/* Category Stats */
+.category-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.category-stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--card-bg);
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+.category-stat-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.category-stat-progress {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.stats-category-header {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--primary-color);
+    padding: 16px 0 8px;
+    border-bottom: 2px solid var(--primary-color);
+    margin-top: 8px;
+}
+
+.stats-category-header:first-child {
+    margin-top: 0;
+}
+
 .stats-list {
     display: flex;
     flex-direction: column;
