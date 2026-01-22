@@ -13,6 +13,8 @@ let cardRevealed = false;
 let selectedCategory = 'all';
 let stats = {};
 let autoPlayEnabled = true;
+let recentCards = []; // Track recently shown cards to avoid repetition
+const RECENT_CARDS_LIMIT = 5; // How many cards to track for recency
 
 // DOM Elements
 const flashcard = document.getElementById('flashcard');
@@ -246,15 +248,23 @@ function saveStats() {
 
 // Get weighted random card (prioritize cards with more wrong answers and higher frequency)
 function getWeightedRandomCard() {
-    const availablePhrases = selectedCategory === 'all'
+    let availablePhrases = selectedCategory === 'all'
         ? PHRASES
         : PHRASES.filter(p => p.category === selectedCategory);
 
     if (availablePhrases.length === 0) return null;
 
+    // Exclude the most recently shown card (no immediate repeats)
+    // But only if we have more than one card available
+    if (availablePhrases.length > 1 && recentCards.length > 0) {
+        const lastCardId = recentCards[recentCards.length - 1];
+        availablePhrases = availablePhrases.filter(p => p.id !== lastCardId);
+    }
+
     // Calculate weights based on:
     // 1. Performance (cards you struggle with get higher weight)
     // 2. Frequency (more common phrases get higher weight)
+    // 3. Recency (recently shown cards get lower weight)
     const weights = availablePhrases.map(phrase => {
         const cardStats = stats[phrase.id] || { right: 0, wrong: 0 };
         const total = cardStats.right + cardStats.wrong;
@@ -274,14 +284,26 @@ function getWeightedRandomCard() {
                 performanceWeight = 1;
             } else {
                 // Learning cards get higher weight based on failure rate
-                performanceWeight = Math.max(1, Math.round(10 * (1 - successRate) + cardStats.wrong));
+                // Cap the wrong bonus at 5 to prevent one card from dominating
+                const wrongBonus = Math.min(cardStats.wrong, 5);
+                performanceWeight = Math.max(1, Math.round(10 * (1 - successRate) + wrongBonus));
             }
         }
 
         // Multiply by frequency to prioritize common phrases
         // Frequency 5 = x2.0, Frequency 1 = x0.6
         const frequencyMultiplier = 0.4 + (frequency * 0.32);
-        return performanceWeight * frequencyMultiplier;
+
+        // Apply recency penalty - reduce weight for recently shown cards
+        let recencyMultiplier = 1;
+        const recentIndex = recentCards.indexOf(phrase.id);
+        if (recentIndex !== -1) {
+            // More recent = higher penalty (closer to end of array = more recent)
+            // Older cards in history get ~0.5x, newer ones get less
+            recencyMultiplier = 0.3 + (0.2 * (recentIndex / RECENT_CARDS_LIMIT));
+        }
+
+        return performanceWeight * frequencyMultiplier * recencyMultiplier;
     });
 
     // Weighted random selection
@@ -314,6 +336,12 @@ function showNextCard() {
         frequencyBadge.className = 'frequency-badge';
         answerButtons.style.display = 'none';
         return;
+    }
+
+    // Track this card in recent history to avoid repetition
+    recentCards.push(currentCard.id);
+    if (recentCards.length > RECENT_CARDS_LIMIT) {
+        recentCards.shift(); // Remove oldest
     }
 
     // Reset card state
