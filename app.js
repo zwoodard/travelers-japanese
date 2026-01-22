@@ -3,14 +3,16 @@
  * Main application logic
  */
 
-// Storage key for localStorage
+// Storage keys for localStorage
 const STORAGE_KEY = 'travelers-japanese-stats';
+const AUTOPLAY_KEY = 'travelers-japanese-autoplay';
 
 // App state
 let currentCard = null;
 let cardRevealed = false;
 let selectedCategory = 'all';
 let stats = {};
+let autoPlayEnabled = true;
 
 // DOM Elements
 const flashcard = document.getElementById('flashcard');
@@ -27,6 +29,7 @@ const categorySelect = document.getElementById('category-select');
 const audioBtn = document.getElementById('audio-btn');
 const audioBtnSlow = document.getElementById('audio-btn-slow');
 const frequencyBadge = document.getElementById('frequency-badge');
+const autoPlayToggle = document.getElementById('auto-play-toggle');
 
 // Speech synthesis
 let speechSynthesis = window.speechSynthesis;
@@ -39,12 +42,26 @@ const tabContents = document.querySelectorAll('.tab-content');
 // Initialize the app
 function init() {
     loadStats();
+    loadAutoPlaySetting();
     populateCategorySelect();
     setupEventListeners();
     initVoices();
     showNextCard();
     updateStatsTab();
     updateCategoriesTab();
+}
+
+// Load auto-play setting from localStorage
+function loadAutoPlaySetting() {
+    const saved = localStorage.getItem(AUTOPLAY_KEY);
+    // Default to true if not set
+    autoPlayEnabled = saved === null ? true : saved === 'true';
+    autoPlayToggle.checked = autoPlayEnabled;
+}
+
+// Save auto-play setting to localStorage
+function saveAutoPlaySetting() {
+    localStorage.setItem(AUTOPLAY_KEY, autoPlayEnabled.toString());
 }
 
 // Initialize speech synthesis voices
@@ -338,6 +355,11 @@ function flipCard() {
         flashcard.classList.add('flipped');
         cardRevealed = true;
         answerButtons.style.display = 'flex';
+
+        // Auto-play audio if enabled
+        if (autoPlayEnabled) {
+            speakPhrase();
+        }
     }
 }
 
@@ -551,6 +573,12 @@ function setupEventListeners() {
     categorySelect.addEventListener('change', (e) => {
         selectedCategory = e.target.value;
         showNextCard();
+    });
+
+    // Auto-play toggle
+    autoPlayToggle.addEventListener('change', (e) => {
+        autoPlayEnabled = e.target.checked;
+        saveAutoPlaySetting();
     });
 
     // Tab buttons
